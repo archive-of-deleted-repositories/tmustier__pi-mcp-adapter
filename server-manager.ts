@@ -143,8 +143,19 @@ export class McpServerManager {
   ): Promise<Transport> {
     const url = new URL(definition.url!);
     
-    // Build request init with headers (excluding Authorization - SDK handles that)
+    // Build headers first (including any bearer token)
     const headers = resolveHeaders(definition.headers) ?? {};
+    
+    // For bearer auth, add the token to headers BEFORE creating requestInit
+    if (definition.auth === "bearer") {
+      const token = definition.bearerToken 
+        ?? (definition.bearerTokenEnv ? process.env[definition.bearerTokenEnv] : undefined);
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+    
+    // Create request init with headers (Authorization now included for bearer auth)
     const requestInit = Object.keys(headers).length > 0 ? { headers } : undefined;
     
     // For OAuth servers, create an auth provider
@@ -166,15 +177,6 @@ export class McpServerManager {
           },
         }
       );
-    }
-    
-    // For bearer auth, add the token to headers
-    if (definition.auth === "bearer") {
-      const token = definition.bearerToken 
-        ?? (definition.bearerTokenEnv ? process.env[definition.bearerTokenEnv] : undefined);
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
     }
     
     // Try StreamableHTTP first (modern MCP servers)
