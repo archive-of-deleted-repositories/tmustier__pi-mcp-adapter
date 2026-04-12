@@ -94,7 +94,6 @@ export default function mcpAdapter(pi: ExtensionAPI) {
       return;
     }
 
-    // Initialize OAuth callback server
     await initializeOAuth().catch(err => {
       console.error("MCP OAuth initialization failed:", err);
     });

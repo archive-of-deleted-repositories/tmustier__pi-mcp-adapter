@@ -12,11 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - OAuth `needs-auth` handling across `/mcp` status/panel, `mcp({ connect })`, `mcp({ tool })`, reconnect flow, lazy/direct tool execution, and startup bootstrap.
-- Startup/shutdown lifecycle regressions in `index.ts` (stale init cleanup, generation guards, and reliable teardown).
-- Error-signal regression for initialization failures in command/direct-tool paths (restored detailed failure messages).
 - OAuth callback cleanup now cancels by stored OAuth state and closes pending transports on failure/cancel paths.
 - Callback server now fails fast when the OAuth callback port is occupied by another process.
 - Package manifest test now ignores root `*.test.ts` files.
+
+## [2.2.2] - 2026-04-03
+
+### Fixed
+- Session lifecycle teardown now handles repeated `session_start` transitions safely and prevents stale async init results from replacing newer state.
+- Shutdown now still runs `gracefulShutdown()` even if metadata cache flushing throws, avoiding leaked MCP processes.
+- Proxy/direct tool init error paths now preserve and surface underlying error messages instead of returning generic failures.
+- Invalid `mcp` tool `args` now fail by throwing with parse/type context instead of returning non-failing tool payloads.
+- Added focused lifecycle regressions tests for stale init cleanup and init-error visibility.
 
 ## [2.2.1] - 2026-03-23
 
